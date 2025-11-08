@@ -50,10 +50,10 @@
     if (!userData) {
       window.location.href = "index.html"; // if not logged in, go back
     } else {
-      document.getElementById("user").textContent = userData.user;
-      document.getElementById("data1").textContent = userData.data1;
-      document.getElementById("data2").textContent = userData.data2;
-      document.getElementById("data3").textContent = userData.data3;
+      document.getElementById("ACCOUNT NAME").textContent = userData.user;
+      document.getElementById("ACCOUNT NUMBER").textContent = userData.data1;
+      document.getElementById("BILL").textContent = userData.data2;
+      document.getElementById("AMOUNT").textContent = userData.data3;
     }
 
     function logout() {
@@ -63,3 +63,4 @@
   </script>
 </body>
 </html>
+
