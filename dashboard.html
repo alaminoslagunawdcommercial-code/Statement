@@ -93,42 +93,50 @@
     google.charts.setOnLoadCallback(drawChart);
 
     function drawChart() {
-      fetch(`${scriptURL}?action=getMonthlyData&username=${userData.user}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.status === "success") {
-            const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-            const values = data.monthlyData;
+  const loadingMessage = document.getElementById('loadingMessage');
+  loadingMessage.style.display = 'block'; // show loading message
 
-            const chartData = [["Month","Consumption"]];
-            for (let i = 0; i < 12; i++) {
-              chartData.push([months[i], values[i]]);
-            }
+  fetch(`${scriptURL}?action=getMonthlyData&username=${userData.user}`)
+    .then(res => res.json())
+    .then(data => {
+      loadingMessage.style.display = 'none'; // hide loading message
 
-            const dataTable = google.visualization.arrayToDataTable(chartData);
+      if (data.status === "success") {
+        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const values = data.monthlyData;
 
-            const options = {
-              title: 'Monthly Consumption',
-              legend: { position: 'none' },
-              vAxis: { title: 'Consumption (Cubic meter)' },
-              hAxis: { title: 'Month' },
-              bars: 'vertical',
-              colors: ['#0984e3']
-            };
+        const chartData = [["Month","Consumption"]];
+        for (let i = 0; i < 12; i++) {
+          chartData.push([months[i], values[i]]);
+        }
 
-            const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-            chart.draw(dataTable, options);
-          } else {
-            document.getElementById('chart_div').innerHTML = 'No data available.';
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          document.getElementById('chart_div').innerHTML = 'Error fetching data.';
-        });
-    }
+        const dataTable = google.visualization.arrayToDataTable(chartData);
+
+        const options = {
+          title: 'Monthly Consumption',
+          legend: { position: 'none' },
+          vAxis: { title: 'Consumption (Cubic meter)' },
+          hAxis: { title: 'Month' },
+          bars: 'vertical',
+          colors: ['#0984e3']
+        };
+
+        const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(dataTable, options);
+      } else {
+        document.getElementById('chart_div').innerHTML = 'No data available.';
+      }
+    })
+    .catch(err => {
+      loadingMessage.style.display = 'none';
+      console.error(err);
+      document.getElementById('chart_div').innerHTML = 'Error fetching data.';
+    });
+}
+
   </script>
 </body>
 </html>
+
 
 
