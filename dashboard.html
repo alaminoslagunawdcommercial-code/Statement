@@ -16,38 +16,40 @@
     .data-box {
       background: white;
       color: #333;
-      padding: 20px;
-      border-radius: 10px;
-      width: 500px;
+      padding: 30px;
+      border-radius: 15px;
+      width: 400px;
       margin: 0 auto;
       box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
+    h2 {
+      margin-bottom: 20px;
+      color: #0984e3;
     }
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
+    .data-item {
+      margin: 15px 0;
+      background-color: #f1f1f1;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 16px;
     }
 
-    th {
-      background-color: #0984e3;
-      color: white;
+    .data-item strong {
+      color: #0984e3;
     }
 
     button {
-      margin-top: 20px;
-      padding: 8px 15px;
+      margin-top: 25px;
+      padding: 10px 20px;
       border: none;
       background-color: #0984e3;
       color: white;
       border-radius: 8px;
       cursor: pointer;
+      font-size: 15px;
     }
 
     button:hover {
@@ -58,24 +60,10 @@
 <body>
   <div class="data-box">
     <h2>User Dashboard</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>Data 1</th>
-          <th>Data 2</th>
-          <th>Data 3</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td id="user"></td>
-          <td id="data1"></td>
-          <td id="data2"></td>
-          <td id="data3"></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="data-item"><strong>User:</strong> <span id="user"></span></div>
+    <div class="data-item"><strong>Data 1:</strong> <span id="data1"></span></div>
+    <div class="data-item"><strong>Data 2:</strong> <span id="data2"></span></div>
+    <div class="data-item"><strong>Data 3:</strong> <span id="data3"></span></div>
     <button onclick="logout()">Logout</button>
   </div>
 
