@@ -3,115 +3,129 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login Page</title>
+  <title>Dashboard</title>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
     body {
       margin: 0;
       padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       background: linear-gradient(135deg, #74b9ff, #0984e3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
     }
-
-    .login-container {
+    .card {
       background: #fff;
       padding: 30px;
       border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      text-align: center;
+      margin-top: 50px;
       width: 300px;
     }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #0984e3;
+    .card h2 { margin-bottom: 20px; color: #0984e3; }
+    .card p { margin: 8px 0; font-size: 16px; }
+    #chart_div {
+      width: 90%;
+      max-width: 800px;
+      height: 400px;
+      margin: 50px 0;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      padding: 20px;
     }
-
-    input[type="text"], input[type="password"] {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
+    #logoutButton {
+      position: fixed;
+      bottom: 20px;
+      padding: 12px 24px;
       border: none;
       border-radius: 8px;
       background-color: #0984e3;
       color: white;
-      font-size: 16px;
       cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background-color: #74b9ff;
-    }
-
-    .error {
-      color: red;
-      font-size: 14px;
-      text-align: center;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h2>Login</h2>
-   <form id="login-form">
-  <input type="text" name="username" placeholder="Username" required />
-  <input type="password" name="password" placeholder="Password" required />
-  <button type="submit">Login</button>
-  <p class="error" id="error-msg"></p>
-</form>
 
-<script>
-  const scriptURL = "https://script.google.com/macros/s/AKfycbxmEkcoJarZl-WA2IrQj-yLtsTDBga5XZVLhSa0GOnDy62cKgYftEG2KDlIrfrYJdU/exec";
-  const form = document.getElementById("login-form");
-  const errorMsg = document.getElementById("error-msg");
-  const submitButton = form.querySelector("button");
-
-  form.addEventListener("submit", e => {
-    e.preventDefault();
-    errorMsg.textContent = ""; // clear previous errors
-    submitButton.disabled = true;
-    submitButton.textContent = "Logging in..."; // show loading text
-
-    const formData = new FormData(form);
-
-    fetch(scriptURL, { method: "POST", body: formData })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "success") {
-          localStorage.setItem("userData", JSON.stringify(data.userData));
-          window.location.href = "dashboard.html";
-        } else {
-          errorMsg.textContent = data.message;
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        errorMsg.textContent = "Error connecting to server.";
-      })
-      .finally(() => {
-        submitButton.disabled = false;
-        submitButton.textContent = "Login"; // revert button text
-      });
-  });
-</script>
-
-
-
+  <div class="card">
+    <h2>User Data</h2>
+    <p>Account name: <span id="user"></span></p>
+    <p>Account Number: <span id="data1"></span></p>
+    <p>Amount: <span id="data2"></span></p>
+    <p>Due date: <span id="data3"></span></p>
   </div>
+
+  <div id="chart_div"></div>
+
+  <!-- Logout button at the bottom -->
+  <button id="logoutButton" onclick="logout()">Logout</button>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxmEkcoJarZl-WA2IrQj-yLtsTDBga5XZVLhSa0GOnDy62cKgYftEG2KDlIrfrYJdU/exec";
+    const userData = JSON.parse(localStorage.getItem("userData"));
+
+    // Safe data display
+    document.getElementById("user").textContent = userData?.user || "N/A";
+    document.getElementById("data1").textContent = userData?.data1 || "N/A";
+    document.getElementById("data3").textContent = userData?.data3 || "N/A";
+
+    // Format data2 as amount with commas and 2 decimals
+    let amount = parseFloat(userData?.data2) || 0;
+    document.getElementById("data2").textContent = amount.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    function logout() {
+      localStorage.removeItem("userData");
+      window.location.href = "login.html";
+    }
+
+    // Load Google Charts
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      fetch(`${scriptURL}?action=getMonthlyData&username=${userData.user}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === "success") {
+            const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            const values = data.monthlyData;
+
+            const chartData = [["Month","Consumption"]];
+            for (let i = 0; i < 12; i++) {
+              chartData.push([months[i], values[i]]);
+            }
+
+            const dataTable = google.visualization.arrayToDataTable(chartData);
+
+            const options = {
+              title: 'Monthly Consumption',
+              legend: { position: 'none' },
+              vAxis: { title: 'Consumption (Cubic meter)' },
+              hAxis: { title: 'Month' },
+              bars: 'vertical',
+              colors: ['#0984e3']
+            };
+
+            const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+            chart.draw(dataTable, options);
+          } else {
+            document.getElementById('chart_div').innerHTML = 'No data available.';
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById('chart_div').innerHTML = 'Error fetching data.';
+        });
+    }
+  </script>
 </body>
 </html>
