@@ -18,9 +18,26 @@
       color: #333;
       padding: 20px;
       border-radius: 10px;
-      width: 300px;
+      width: 500px;
       margin: 0 auto;
       box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #0984e3;
+      color: white;
     }
 
     button {
@@ -32,15 +49,33 @@
       border-radius: 8px;
       cursor: pointer;
     }
+
+    button:hover {
+      background-color: #74b9ff;
+    }
   </style>
 </head>
 <body>
   <div class="data-box">
-    <h2>User Data</h2>
-    <p><strong>ACCOUNT NAME</strong> <span id="user"></span></p>
-    <p><strong>ACCOUNT NUMBER</strong> <span id="data1"></span></p>
-    <p><strong>BILL AMOUNT</strong> <span id="data2"></span></p>
-    <p><strong>DUE DATE</strong> <span id="data3"></span></p>
+    <h2>User Dashboard</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Data 1</th>
+          <th>Data 2</th>
+          <th>Data 3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="user"></td>
+          <td id="data1"></td>
+          <td id="data2"></td>
+          <td id="data3"></td>
+        </tr>
+      </tbody>
+    </table>
     <button onclick="logout()">Logout</button>
   </div>
 
@@ -48,7 +83,7 @@
     const userData = JSON.parse(localStorage.getItem("userData"));
 
     if (!userData) {
-      window.location.href = "index.html"; // if not logged in, go back
+      window.location.href = "index.html"; // redirect if not logged in
     } else {
       document.getElementById("user").textContent = userData.user;
       document.getElementById("data1").textContent = userData.data1;
