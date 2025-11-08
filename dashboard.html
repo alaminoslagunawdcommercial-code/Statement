@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #74b9ff, #0984e3);
+      color: #fff;
+      text-align: center;
+      padding-top: 100px;
+    }
+
+    .data-box {
+      background: white;
+      color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      margin: 0 auto;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 8px 15px;
+      border: none;
+      background-color: #0984e3;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="data-box">
+    <h2>User Data</h2>
+    <p><strong>User:</strong> <span id="user"></span></p>
+    <p><strong>Data 1:</strong> <span id="data1"></span></p>
+    <p><strong>Data 2:</strong> <span id="data2"></span></p>
+    <p><strong>Data 3:</strong> <span id="data3"></span></p>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    const userData = JSON.parse(localStorage.getItem("userData"));
+
+    if (!userData) {
+      window.location.href = "index.html"; // if not logged in, go back
+    } else {
+      document.getElementById("user").textContent = userData.user;
+      document.getElementById("data1").textContent = userData.data1;
+      document.getElementById("data2").textContent = userData.data2;
+      document.getElementById("data3").textContent = userData.data3;
+    }
+
+    function logout() {
+      localStorage.removeItem("userData");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
