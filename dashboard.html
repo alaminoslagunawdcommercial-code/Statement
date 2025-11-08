@@ -37,10 +37,10 @@
 <body>
   <div class="data-box">
     <h2>User Data</h2>
-    <p><strong>User:</strong> <span id=""ACCOUNT NAME"></span></p>
-    <p><strong>Data 1:</strong> <span id="ACCOUNT NUMBER"></span></p>
-    <p><strong>Data 2:</strong> <span id="BILL"></span></p>
-    <p><strong>Data 3:</strong> <span id="AMOUNT"></span></p>
+    <p><strong>ACCOUNT NAME</strong> <span id="user"></span></p>
+    <p><strong>ACCOUNT NUMBER</strong> <span id="data1"></span></p>
+    <p><strong>BILL AMOUNT</strong> <span id="data2"></span></p>
+    <p><strong>DUE DATE</strong> <span id="data3"></span></p>
     <button onclick="logout()">Logout</button>
   </div>
 
@@ -50,10 +50,10 @@
     if (!userData) {
       window.location.href = "index.html"; // if not logged in, go back
     } else {
-      document.getElementById("ACCOUNT NAME").textContent = userData.user;
-      document.getElementById("ACCOUNT NUMBER").textContent = userData.data1;
-      document.getElementById("BILL").textContent = userData.data2;
-      document.getElementById("AMOUNT").textContent = userData.data3;
+      document.getElementById("user").textContent = userData.user;
+      document.getElementById("data1").textContent = userData.data1;
+      document.getElementById("data2").textContent = userData.data2;
+      document.getElementById("data3").textContent = userData.data3;
     }
 
     function logout() {
@@ -63,5 +63,3 @@
   </script>
 </body>
 </html>
-
-
