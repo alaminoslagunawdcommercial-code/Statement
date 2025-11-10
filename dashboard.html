@@ -103,32 +103,32 @@
     // Load Google Charts first
     google.charts.load('current', { packages: ['corechart'] });
 
-    // Simulate loading both user data and chart data
+    // Wait for charts and data together
+    google.charts.setOnLoadCallback(loadAll);
+
     async function loadAll() {
       try {
-        // Step 1: Load user data
+        // Load user data first (local)
         loadUserData();
 
-        // Step 2: Load chart (wait for google to be ready)
-        await new Promise(resolve => google.charts.setOnLoadCallback(resolve));
+        // Then load chart from server
         await loadChartData();
 
-        // Step 3: Once all done, hide loading and show content
+        // Everything done → show content
         loadingScreen.style.display = "none";
         mainContent.style.display = "flex";
       } catch (error) {
-        loadingScreen.textContent = "Error loading data.";
         console.error(error);
+        loadingScreen.textContent = "Error loading data.";
       }
     }
 
     function loadUserData() {
-      // Fill in safe fallback values
       document.getElementById("user").textContent = userData?.user || "N/A";
       document.getElementById("data1").textContent = userData?.data1 || "N/A";
       document.getElementById("data3").textContent = userData?.data3 || "N/A";
 
-      let amount = parseFloat(userData?.data2) || 0;
+      const amount = parseFloat(userData?.data2) || 0;
       document.getElementById("data2").textContent = amount.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
@@ -136,8 +136,8 @@
     }
 
     async function loadChartData() {
-      const res = await fetch(`${scriptURL}?action=getMonthlyData&username=${userData.user}`);
-      const data = await res.json();
+      const response = await fetch(`${scriptURL}?action=getMonthlyData&username=${encodeURIComponent(userData.user)}`);
+      const data = await response.json();
 
       if (data.status === "success") {
         const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -167,9 +167,6 @@
       localStorage.removeItem("userData");
       window.location.href = "index.html";
     }
-
-    // Start loading process
-    loadAll();
   </script>
 </body>
 </html>
