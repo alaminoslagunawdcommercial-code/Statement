@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
-
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
   <style>
     * {
       box-sizing: border-box;
@@ -89,19 +87,18 @@
     const scriptURL = "https://script.google.com/macros/s/AKfycbxmEkcoJarZl-WA2IrQj-yLtsTDBga5XZVLhSa0GOnDy62cKgYftEG2KDlIrfrYJdU/exec";
     const userData = JSON.parse(localStorage.getItem("userData"));
 
-    // Display user data safely
+    // Safe data display
     document.getElementById("user").textContent = userData?.user || "N/A";
     document.getElementById("data1").textContent = userData?.data1 || "N/A";
     document.getElementById("data3").textContent = userData?.data3 || "N/A";
 
-    // Format amount with commas and 2 decimal places
-    const amount = parseFloat(userData?.data2) || 0;
+    // Format data2 as amount with commas and 2 decimals
+    let amount = parseFloat(userData?.data2) || 0;
     document.getElementById("data2").textContent = amount.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
 
-    // Logout function
     function logout() {
       console.log("Logging out...");
       localStorage.removeItem("userData");
@@ -109,17 +106,17 @@
     }
 
     // Load Google Charts
-    google.charts.load('current', { packages: ['corechart'] });
+    google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawChart);
 
     function drawChart() {
       const loadingMessage = document.getElementById('loadingMessage');
-      loadingMessage.style.display = 'block'; // Show loading message
+      loadingMessage.style.display = 'block'; // show loading message
 
-      fetch(`${scriptURL}?action=getMonthlyData&username=${userData.user}`)
+      fetch(${scriptURL}?action=getMonthlyData&username=${userData.user})
         .then(res => res.json())
         .then(data => {
-          loadingMessage.style.display = 'none'; // Hide loading message
+          loadingMessage.style.display = 'none'; // hide loading message
 
           if (data.status === "success") {
             const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
