@@ -4,9 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
+
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -14,43 +20,29 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       min-height: 100vh;
-    }
-
-    #loadingScreen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(255,255,255,0.9);
-      color: #0984e3;
-      font-size: 28px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
-
-    .content {
-      display: none;
-      width: 100%;
-      flex-direction: column;
-      align-items: center;
+      position: relative;
     }
 
     .card {
       background: #fff;
       padding: 30px;
       border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       text-align: center;
       margin-top: 50px;
       width: 300px;
     }
 
-    .card h2 { margin-bottom: 20px; color: #0984e3; }
-    .card p { margin: 8px 0; font-size: 16px; }
+    .card h2 {
+      margin-bottom: 20px;
+      color: #0984e3;
+    }
+
+    .card p {
+      margin: 8px 0;
+      font-size: 16px;
+    }
 
     #chart_div {
       width: 90%;
@@ -59,7 +51,7 @@
       margin: 50px 0;
       background: #fff;
       border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       padding: 20px;
     }
 
@@ -76,96 +68,89 @@
     }
   </style>
 </head>
+
 <body>
-
-  <div id="loadingScreen">LOADING...</div>
-
-  <div class="content" id="mainContent">
-    <div class="card">
-      <h2>User Data</h2>
-      <p>Account name: <span id="user"></span></p>
-      <p>Account Number: <span id="data1"></span></p>
-      <p>Amount: <span id="data2"></span></p>
-      <p>Due date: <span id="data3"></span></p>
-    </div>
-
-    <div id="chart_div"></div>
-
-    <button id="logoutButton" onclick="logout()">Logout</button>
+  <div class="card">
+    <h2>User Data</h2>
+    <p>Account name: <span id="user"></span></p>
+    <p>Account Number: <span id="data1"></span></p>
+    <p>Amount: <span id="data2"></span></p>
+    <p>Due date: <span id="data3"></span></p>
   </div>
+
+  <div id="chart_div">
+    <p id="loadingMessage" style="text-align:center; font-size:18px; color:#0984e3;">Loading chart...</p>
+  </div>
+
+  <!-- Logout button at the bottom -->
+  <button id="logoutButton" onclick="logout()">Logout</button>
 
   <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbxmEkcoJarZl-WA2IrQj-yLtsTDBga5XZVLhSa0GOnDy62cKgYftEG2KDlIrfrYJdU/exec";
     const userData = JSON.parse(localStorage.getItem("userData"));
-    const loadingScreen = document.getElementById("loadingScreen");
-    const mainContent = document.getElementById("mainContent");
 
-    // Load Google Charts first
-    google.charts.load('current', { packages: ['corechart'] });
+    // Display user data safely
+    document.getElementById("user").textContent = userData?.user || "N/A";
+    document.getElementById("data1").textContent = userData?.data1 || "N/A";
+    document.getElementById("data3").textContent = userData?.data3 || "N/A";
 
-    // Wait for charts and data together
-    google.charts.setOnLoadCallback(loadAll);
+    // Format amount with commas and 2 decimal places
+    const amount = parseFloat(userData?.data2) || 0;
+    document.getElementById("data2").textContent = amount.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
 
-    async function loadAll() {
-      try {
-        // Load user data first (local)
-        loadUserData();
-
-        // Then load chart from server
-        await loadChartData();
-
-        // Everything done → show content
-        loadingScreen.style.display = "none";
-        mainContent.style.display = "flex";
-      } catch (error) {
-        console.error(error);
-        loadingScreen.textContent = "Error loading data.";
-      }
-    }
-
-    function loadUserData() {
-      document.getElementById("user").textContent = userData?.user || "N/A";
-      document.getElementById("data1").textContent = userData?.data1 || "N/A";
-      document.getElementById("data3").textContent = userData?.data3 || "N/A";
-
-      const amount = parseFloat(userData?.data2) || 0;
-      document.getElementById("data2").textContent = amount.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    }
-
-    async function loadChartData() {
-      const response = await fetch(`${scriptURL}?action=getMonthlyData&username=${encodeURIComponent(userData.user)}`);
-      const data = await response.json();
-
-      if (data.status === "success") {
-        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-        const chartData = [["Month","Consumption"]];
-        for (let i = 0; i < 12; i++) {
-          chartData.push([months[i], data.monthlyData[i]]);
-        }
-
-        const dataTable = google.visualization.arrayToDataTable(chartData);
-        const options = {
-          title: 'Monthly Consumption',
-          legend: { position: 'none' },
-          vAxis: { title: 'Consumption (Cubic meter)' },
-          hAxis: { title: 'Month' },
-          bars: 'vertical',
-          colors: ['#0984e3']
-        };
-
-        const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-        chart.draw(dataTable, options);
-      } else {
-        document.getElementById('chart_div').innerHTML = 'No data available.';
-      }
-    }
-
+    // Logout function
     function logout() {
+      console.log("Logging out...");
       localStorage.removeItem("userData");
       window.location.href = "index.html";
+    }
+
+    // Load Google Charts
+    google.charts.load('current', { packages: ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      const loadingMessage = document.getElementById('loadingMessage');
+      loadingMessage.style.display = 'block'; // Show loading message
+
+      fetch(`${scriptURL}?action=getMonthlyData&username=${userData.user}`)
+        .then(res => res.json())
+        .then(data => {
+          loadingMessage.style.display = 'none'; // Hide loading message
+
+          if (data.status === "success") {
+            const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            const values = data.monthlyData;
+            const chartData = [["Month","Consumption"]];
+
+            for (let i = 0; i < 12; i++) {
+              chartData.push([months[i], values[i]]);
+            }
+
+            const dataTable = google.visualization.arrayToDataTable(chartData);
+            const options = {
+              title: 'Monthly Consumption',
+              legend: { position: 'none' },
+              vAxis: { title: 'Consumption (Cubic meter)' },
+              hAxis: { title: 'Month' },
+              bars: 'vertical',
+              colors: ['#0984e3']
+            };
+
+            const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+            chart.draw(dataTable, options);
+          } else {
+            document.getElementById('chart_div').innerHTML = 'No data available.';
+          }
+        })
+        .catch(err => {
+          loadingMessage.style.display = 'none';
+          console.error(err);
+          document.getElementById('chart_div').innerHTML = 'Error fetching data.';
+        });
     }
   </script>
 </body>
