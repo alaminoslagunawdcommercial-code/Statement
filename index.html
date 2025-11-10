@@ -76,23 +76,19 @@
 </form>
 
 <script>
-  const scriptURL = "https://script.google.com/macros/s/AKfycbxmEkcoJarZl-WA2IrQj-yLtsTDBga5XZVLhSa0GOnDy62cKgYftEG2KDlIrfrYJdU/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbxmEkcoJarZl-WA2IrQj-yLtsTDBga5XZVLhSa0GOnDy62cKgYftEG2KDlIrfrYJdU/exec"; // same as before
   const form = document.getElementById("login-form");
   const errorMsg = document.getElementById("error-msg");
-  const submitButton = form.querySelector("button");
 
   form.addEventListener("submit", e => {
     e.preventDefault();
-    errorMsg.textContent = ""; // clear previous errors
-    submitButton.disabled = true;
-    submitButton.textContent = "Logging in..."; // show loading text
-
     const formData = new FormData(form);
 
     fetch(scriptURL, { method: "POST", body: formData })
       .then(res => res.json())
       .then(data => {
         if (data.status === "success") {
+          // Save user data to localStorage
           localStorage.setItem("userData", JSON.stringify(data.userData));
           window.location.href = "dashboard.html";
         } else {
@@ -102,14 +98,9 @@
       .catch(err => {
         console.error(err);
         errorMsg.textContent = "Error connecting to server.";
-      })
-      .finally(() => {
-        submitButton.disabled = false;
-        submitButton.textContent = "Login"; // revert button text
       });
   });
 </script>
-
 
 
   </div>
