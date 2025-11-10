@@ -14,9 +14,31 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       min-height: 100vh;
-      position: relative;
     }
+
+    #loadingScreen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.9);
+      color: #0984e3;
+      font-size: 28px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .content {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+    }
+
     .card {
       background: #fff;
       padding: 30px;
@@ -26,8 +48,10 @@
       margin-top: 50px;
       width: 300px;
     }
+
     .card h2 { margin-bottom: 20px; color: #0984e3; }
     .card p { margin: 8px 0; font-size: 16px; }
+
     #chart_div {
       width: 90%;
       max-width: 800px;
@@ -38,6 +62,7 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.2);
       padding: 20px;
     }
+
     #logoutButton {
       position: fixed;
       bottom: 20px;
@@ -53,67 +78,75 @@
 </head>
 <body>
 
-  <div class="card">
-    <h2>User Data</h2>
-    <p>Account name: <span id="user"></span></p>
-    <p>Account Number: <span id="data1"></span></p>
-    <p>Amount: <span id="data2"></span></p>
-    <p>Due date: <span id="data3"></span></p>
+  <div id="loadingScreen">LOADING...</div>
+
+  <div class="content" id="mainContent">
+    <div class="card">
+      <h2>User Data</h2>
+      <p>Account name: <span id="user"></span></p>
+      <p>Account Number: <span id="data1"></span></p>
+      <p>Amount: <span id="data2"></span></p>
+      <p>Due date: <span id="data3"></span></p>
+    </div>
+
+    <div id="chart_div"></div>
+
+    <button id="logoutButton" onclick="logout()">Logout</button>
   </div>
-
-  <div id="chart_div">
-  <p id="loadingMessage" style="text-align:center; font-size:18px; color:#0984e3;">Loading chart...</p>
-</div>
-
-  <!-- Logout button at the bottom -->
-  <button id="logoutButton" onclick="logout()">Logout</button>
 
   <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbxmEkcoJarZl-WA2IrQj-yLtsTDBga5XZVLhSa0GOnDy62cKgYftEG2KDlIrfrYJdU/exec";
     const userData = JSON.parse(localStorage.getItem("userData"));
+    const loadingScreen = document.getElementById("loadingScreen");
+    const mainContent = document.getElementById("mainContent");
 
-    // Safe data display
-    document.getElementById("user").textContent = userData?.user || "N/A";
-    document.getElementById("data1").textContent = userData?.data1 || "N/A";
-    document.getElementById("data3").textContent = userData?.data3 || "N/A";
+    // Load Google Charts first
+    google.charts.load('current', { packages: ['corechart'] });
 
-    // Format data2 as amount with commas and 2 decimals
-    let amount = parseFloat(userData?.data2) || 0;
-    document.getElementById("data2").textContent = amount.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
+    // Simulate loading both user data and chart data
+    async function loadAll() {
+      try {
+        // Step 1: Load user data
+        loadUserData();
 
-    function logout() {
-  console.log("Logging out...");
-  localStorage.removeItem("userData");
-  window.location.href = "index.html";
-}
+        // Step 2: Load chart (wait for google to be ready)
+        await new Promise(resolve => google.charts.setOnLoadCallback(resolve));
+        await loadChartData();
 
-    // Load Google Charts
-    google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawChart);
+        // Step 3: Once all done, hide loading and show content
+        loadingScreen.style.display = "none";
+        mainContent.style.display = "flex";
+      } catch (error) {
+        loadingScreen.textContent = "Error loading data.";
+        console.error(error);
+      }
+    }
 
-    function drawChart() {
-  const loadingMessage = document.getElementById('loadingMessage');
-  loadingMessage.style.display = 'block'; // show loading message
+    function loadUserData() {
+      // Fill in safe fallback values
+      document.getElementById("user").textContent = userData?.user || "N/A";
+      document.getElementById("data1").textContent = userData?.data1 || "N/A";
+      document.getElementById("data3").textContent = userData?.data3 || "N/A";
 
-  fetch(`${scriptURL}?action=getMonthlyData&username=${userData.user}`)
-    .then(res => res.json())
-    .then(data => {
-      loadingMessage.style.display = 'none'; // hide loading message
+      let amount = parseFloat(userData?.data2) || 0;
+      document.getElementById("data2").textContent = amount.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    async function loadChartData() {
+      const res = await fetch(`${scriptURL}?action=getMonthlyData&username=${userData.user}`);
+      const data = await res.json();
 
       if (data.status === "success") {
         const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-        const values = data.monthlyData;
-
         const chartData = [["Month","Consumption"]];
         for (let i = 0; i < 12; i++) {
-          chartData.push([months[i], values[i]]);
+          chartData.push([months[i], data.monthlyData[i]]);
         }
 
         const dataTable = google.visualization.arrayToDataTable(chartData);
-
         const options = {
           title: 'Monthly Consumption',
           legend: { position: 'none' },
@@ -128,18 +161,15 @@
       } else {
         document.getElementById('chart_div').innerHTML = 'No data available.';
       }
-    })
-    .catch(err => {
-      loadingMessage.style.display = 'none';
-      console.error(err);
-      document.getElementById('chart_div').innerHTML = 'Error fetching data.';
-    });
-}
+    }
 
+    function logout() {
+      localStorage.removeItem("userData");
+      window.location.href = "index.html";
+    }
+
+    // Start loading process
+    loadAll();
   </script>
 </body>
 </html>
-
-
-
-
