@@ -6,11 +6,7 @@
   <title>Dashboard</title>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
     body {
       margin: 0;
       padding: 0;
@@ -21,27 +17,17 @@
       min-height: 100vh;
       position: relative;
     }
-
     .card {
       background: #fff;
       padding: 30px;
       border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
       text-align: center;
       margin-top: 50px;
       width: 300px;
     }
-
-    .card h2 {
-      margin-bottom: 20px;
-      color: #0984e3;
-    }
-
-    .card p {
-      margin: 8px 0;
-      font-size: 16px;
-    }
-
+    .card h2 { margin-bottom: 20px; color: #0984e3; }
+    .card p { margin: 8px 0; font-size: 16px; }
     #chart_div {
       width: 90%;
       max-width: 800px;
@@ -49,10 +35,9 @@
       margin: 50px 0;
       background: #fff;
       border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
       padding: 20px;
     }
-
     #logoutButton {
       position: fixed;
       bottom: 20px;
@@ -66,8 +51,8 @@
     }
   </style>
 </head>
-
 <body>
+
   <div class="card">
     <h2>User Data</h2>
     <p>Account name: <span id="user"></span></p>
@@ -77,8 +62,8 @@
   </div>
 
   <div id="chart_div">
-    <p id="loadingMessage" style="text-align:center; font-size:18px; color:#0984e3;">Loading chart...</p>
-  </div>
+  <p id="loadingMessage" style="text-align:center; font-size:18px; color:#0984e3;">Loading chart...</p>
+</div>
 
   <!-- Logout button at the bottom -->
   <button id="logoutButton" onclick="logout()">Logout</button>
@@ -100,55 +85,60 @@
     });
 
     function logout() {
-      console.log("Logging out...");
-      localStorage.removeItem("userData");
-      window.location.href = "index.html";
-    }
+  console.log("Logging out...");
+  localStorage.removeItem("userData");
+  window.location.href = "index.html";
+}
 
     // Load Google Charts
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawChart);
 
     function drawChart() {
-      const loadingMessage = document.getElementById('loadingMessage');
-      loadingMessage.style.display = 'block'; // show loading message
+  const loadingMessage = document.getElementById('loadingMessage');
+  loadingMessage.style.display = 'block'; // show loading message
 
-      fetch(${scriptURL}?action=getMonthlyData&username=${userData.user})
-        .then(res => res.json())
-        .then(data => {
-          loadingMessage.style.display = 'none'; // hide loading message
+  fetch(`${scriptURL}?action=getMonthlyData&username=${userData.user}`)
+    .then(res => res.json())
+    .then(data => {
+      loadingMessage.style.display = 'none'; // hide loading message
 
-          if (data.status === "success") {
-            const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-            const values = data.monthlyData;
-            const chartData = [["Month","Consumption"]];
+      if (data.status === "success") {
+        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const values = data.monthlyData;
 
-            for (let i = 0; i < 12; i++) {
-              chartData.push([months[i], values[i]]);
-            }
+        const chartData = [["Month","Consumption"]];
+        for (let i = 0; i < 12; i++) {
+          chartData.push([months[i], values[i]]);
+        }
 
-            const dataTable = google.visualization.arrayToDataTable(chartData);
-            const options = {
-              title: 'Monthly Consumption',
-              legend: { position: 'none' },
-              vAxis: { title: 'Consumption (Cubic meter)' },
-              hAxis: { title: 'Month' },
-              bars: 'vertical',
-              colors: ['#0984e3']
-            };
+        const dataTable = google.visualization.arrayToDataTable(chartData);
 
-            const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-            chart.draw(dataTable, options);
-          } else {
-            document.getElementById('chart_div').innerHTML = 'No data available.';
-          }
-        })
-        .catch(err => {
-          loadingMessage.style.display = 'none';
-          console.error(err);
-          document.getElementById('chart_div').innerHTML = 'Error fetching data.';
-        });
-    }
+        const options = {
+          title: 'Monthly Consumption',
+          legend: { position: 'none' },
+          vAxis: { title: 'Consumption (Cubic meter)' },
+          hAxis: { title: 'Month' },
+          bars: 'vertical',
+          colors: ['#0984e3']
+        };
+
+        const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(dataTable, options);
+      } else {
+        document.getElementById('chart_div').innerHTML = 'No data available.';
+      }
+    })
+    .catch(err => {
+      loadingMessage.style.display = 'none';
+      console.error(err);
+      document.getElementById('chart_div').innerHTML = 'Error fetching data.';
+    });
+}
+
   </script>
 </body>
 </html>
+
+
+
