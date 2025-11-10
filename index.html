@@ -58,15 +58,6 @@
       background-color: #74b9ff;
     }
 
-    .register-btn {
-      background-color: #6c5ce7;
-      margin-top: 10px;
-    }
-
-    .register-btn:hover {
-      background-color: #a29bfe;
-    }
-
     .error {
       color: red;
       font-size: 14px;
@@ -77,45 +68,50 @@
 <body>
   <div class="login-container">
     <h2>Login</h2>
-    <form id="login-form">
-      <input type="text" name="username" placeholder="Username" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Login</button>
-      <button type="button" class="register-btn" id="register-btn">Register</button>
-      <p class="error" id="error-msg"></p>
-    </form>
+   <form id="login-form">
+  <input type="text" name="username" placeholder="Username" required />
+  <input type="password" name="password" placeholder="Password" required />
+  <button type="submit">Login</button>
+  <p class="error" id="error-msg"></p>
+</form>
 
-    <script>
-      const scriptURL = "https://script.google.com/macros/s/AKfycbxmEkcoJarZl-WA2IrQj-yLtsTDBga5XZVLhSa0GOnDy62cKgYftEG2KDlIrfrYJdU/exec";
-      const form = document.getElementById("login-form");
-      const errorMsg = document.getElementById("error-msg");
-      const registerBtn = document.getElementById("register-btn");
+<script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbxmEkcoJarZl-WA2IrQj-yLtsTDBga5XZVLhSa0GOnDy62cKgYftEG2KDlIrfrYJdU/exec";
+  const form = document.getElementById("login-form");
+  const errorMsg = document.getElementById("error-msg");
+  const submitButton = form.querySelector("button");
 
-      form.addEventListener("submit", e => {
-        e.preventDefault();
-        const formData = new FormData(form);
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    errorMsg.textContent = ""; // clear previous errors
+    submitButton.disabled = true;
+    submitButton.textContent = "Logging in..."; // show loading text
 
-        fetch(scriptURL, { method: "POST", body: formData })
-          .then(res => res.json())
-          .then(data => {
-            if (data.status === "success") {
-              localStorage.setItem("userData", JSON.stringify(data.userData));
-              window.location.href = "dashboard.html";
-            } else {
-              errorMsg.textContent = data.message;
-            }
-          })
-          .catch(err => {
-            console.error(err);
-            errorMsg.textContent = "Error connecting to server.";
-          });
+    const formData = new FormData(form);
+
+    fetch(scriptURL, { method: "POST", body: formData })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          localStorage.setItem("userData", JSON.stringify(data.userData));
+          window.location.href = "dashboard.html";
+        } else {
+          errorMsg.textContent = data.message;
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        errorMsg.textContent = "Error connecting to server.";
+      })
+      .finally(() => {
+        submitButton.disabled = false;
+        submitButton.textContent = "Login"; // revert button text
       });
+  });
+</script>
 
-      // Open Google Form in a new tab
-      registerBtn.addEventListener("click", () => {
-        window.open("https://docs.google.com/forms/d/e/1FAIpQLSfMLxKO3SabjK4egad7k88ewck0JuEOz0QehrBx-vLL34Dj1w/viewform?usp=dialog", "_blank"); // replace with your Google Form link
-      });
-    </script>
+
+
   </div>
 </body>
 </html>
