@@ -78,7 +78,7 @@
   <div class="login-container">
     <h2>Login</h2>
     <form id="login-form">
-      <input type="text" name="username" placeholder="Account Number" required />
+      <input type="text" name="username" placeholder="Username" required />
       <input type="password" name="password" placeholder="Password" required />
       <button type="submit">Login</button>
       <button type="button" class="register-btn" id="register-btn">Register</button>
@@ -111,12 +111,11 @@
           });
       });
 
-      // Placeholder redirect for the Register button
+      // Open Google Form in a new tab
       registerBtn.addEventListener("click", () => {
-        window.location.href = "https://docs.google.com/forms/d/e/1FAIpQLSfMLxKO3SabjK4egad7k88ewck0JuEOz0QehrBx-vLL34Dj1w/viewform?usp=header"; // replace with your Google Form link
+        window.open("https://docs.google.com/forms/d/e/1FAIpQLSfMLxKO3SabjK4egad7k88ewck0JuEOz0QehrBx-vLL34Dj1w/viewform?usp=dialog", "_blank"); // replace with your Google Form link
       });
     </script>
   </div>
 </body>
 </html>
-
