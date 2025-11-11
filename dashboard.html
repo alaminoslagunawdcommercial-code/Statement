@@ -33,7 +33,7 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.2);
       text-align: center;
       margin-top: 50px;
-      width: 300px;
+      width: 350px;
     }
     .card h2 { margin-bottom: 20px; color: #0984e3; }
     .card p { margin: 8px 0; font-size: 16px; }
@@ -63,17 +63,25 @@
 <body>
 
   <div class="card">
-    <h2>User Data</h2>
-    <p>ACC Number: <span id="user"></span></p>
-    <p>ACC Name: <span id="data1"></span></p>
-    <p>Amount: <span id="data2"></span></p>
-    <p>Due date: <span id="data3"></span></p>
+    <h2 style="font-size: 20px;">Statement of Account</h2>
+    <p><strong>ACC Name:</strong> <span id="data1"></span></p>
+	<p><strong>ACC Number:</strong> <span id="user"></span></p>      
+    <p><strong>Due date:</strong> <span id="data3"></span></p>
+	<p><strong>Arrears:</strong> <span id="data4"></span></p>
+	<p><strong>Current Amount:</strong> <span id="data5"></span></p>
+	<p><strong>Total Amount Due:</strong> </p>
+	<p style="font-size: 40px; border: 2px solid black; padding: 8px; display: inline-block;">
+  <span id="data2"></span> Php
+</p>
+	
   </div>
 
   <div id="chart_div">
   <p id="loadingMessage" style="text-align:center; font-size:18px; color:#0984e3;">Loading chart...</p>
 </div>
-
+<div>
+<p>Note: this data is not real Time due to meter reading schedule and Payment Posting.(24 to 48 hrs delay is expected)</p>
+</div>
   <!-- Logout button at the bottom -->
   <button id="logoutButton" onclick="logout()">Logout</button>
 
@@ -85,7 +93,8 @@
     document.getElementById("user").textContent = userData?.user || "N/A";
     document.getElementById("data1").textContent = userData?.data1 || "N/A";
     document.getElementById("data3").textContent = userData?.data3 || "N/A";
-
+	document.getElementById("data4").textContent = userData?.data4 || "N/A";
+    document.getElementById("data5").textContent = userData?.data5 || "N/A";
     // Format data2 as amount with commas and 2 decimals
     let amount = parseFloat(userData?.data2) || 0;
     document.getElementById("data2").textContent = amount.toLocaleString('en-US', {
