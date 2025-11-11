@@ -61,7 +61,9 @@
   </style>
 </head>
 <body>
-
+<div>
+<p>Note: this data might not reflect real Time due to meter reading schedule and Payment Posting.(24 to 48 hrs delay is expected)</p>
+</div>
   <div class="card">
     <h2 style="font-size: 20px;">Statement of Account</h2>
     <p><strong>ACC Name:</strong> <span id="data1"></span></p>
@@ -82,9 +84,7 @@
   <div id="chart_div">
   <p id="loadingMessage" style="text-align:center; font-size:18px; color:#0984e3;">Loading chart...</p>
 </div>
-<div>
-<p>Note: this data is not real Time due to meter reading schedule and Payment Posting.(24 to 48 hrs delay is expected)</p>
-</div>
+
   <!-- Logout button at the bottom -->
   <button id="logoutButton" onclick="logout()">Logout</button>
 
@@ -156,7 +156,7 @@
       document.getElementById('chart_div').innerHTML = 'Error fetching data.';
     });
 }
- document.addEventListener('contextmenu', event => event.preventDefault());
+document.addEventListener('contextmenu', event => event.preventDefault());
   document.onkeydown = function(e) {
     if (e.keyCode == 123 || // F12
         (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || // Ctrl+Shift+I
@@ -164,11 +164,11 @@
         (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) { // Ctrl+U
       return false;
     }
-  };
+  }
+
   </script>
 </body>
 </html>
-
 
 
 
